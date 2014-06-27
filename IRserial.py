@@ -7,7 +7,7 @@ for i in range(3):
     except Exception as e:
         if i == 2: raise e
     else: break
-print 'Connected to', ser.name
+print('Connected to', ser.name)
 MODEL = 0
 
 CMDS = {
@@ -20,9 +20,9 @@ CMDS = {
 def int2ss(ss):
     return ''.join((str(th),chr(th+ord('a')-10))[th > 9] for th in ss)
 def valid(ss):
-    return sorted((th+i)%len(ss) for i,th in enumerate(ss)) == range(len(ss))
+    return sorted((th+i)%len(ss) for i,th in enumerate(ss)) == list(range(len(ss)))
 def disp():
-    print int2ss(ss), '-', ('Invalid','Valid')[valid(ss)]
+    print(int2ss(ss), '-', ('Invalid','Valid')[valid(ss)])
 def add10():
     if ss and ss[-1] < 26: ss[-1] += 10
 def simulate():
@@ -63,21 +63,21 @@ ss = []
 while 1:
   try:
     inp = ser.readline().strip()
-    m,v = map(int,inp.split())
+    m,v = list(map(int,inp.split()))
   except Exception:
-    print inp
+    print(inp)
   else:
     if m == MODEL:
       if v in NUMBERS:
         ss.append(NUMBERS[v])
-        print NUMBERS[v]
+        print(NUMBERS[v])
       elif v in CMDS:
         cmd(CMDS[v][1])
-        print CMDS[v][0]
+        print(CMDS[v][0])
       elif v in FUNCTIONS:
         FUNCTIONS[v][1]()
-        print FUNCTIONS[v][0]
+        print(FUNCTIONS[v][0])
       else:
-        print v
+        print(v)
         
 
