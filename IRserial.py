@@ -1,6 +1,8 @@
 #!/usr/bin/python
 
 import serial,os
+import media
+
 cmd = os.system
 for i in range(3):
     try: ser = serial.Serial('/dev/ttyUSB%d'%i, 115200)
@@ -33,7 +35,7 @@ def clear():
     global ss
     ss = []
 def restart():
-    cmd('python ~/IRserial.py')
+    cmd('python ~/scripts/IRSerial/IRserial.py')
     exit()
 
 FUNCTIONS = {
@@ -42,7 +44,8 @@ FUNCTIONS = {
 176 : ('X-BASS - clear', clear),
 48 : ('EQUALIZER - simulate', simulate),
 72 : ('REPEAT - restart script', restart),
-0 : ('POWER - exit', exit)
+0 : ('POWER - exit', exit),
+32 : ('CD - PlayPause', lambda:media.send('PlayPause')),
 }
 
 NUMBERS = {
