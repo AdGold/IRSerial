@@ -46,6 +46,9 @@ FUNCTIONS = {
 72 : ('REPEAT - restart script', restart),
 0 : ('POWER - exit', exit),
 32 : ('CD - PlayPause', lambda:media.send('PlayPause')),
+144: ('<< - Prev', lambda:media.send('Prev')),
+192 : ('>> - Next', lambda:media.send('Next')),
+16 : ('STOP - Stop', lambda:media.send('Stop')),
 }
 
 NUMBERS = {
