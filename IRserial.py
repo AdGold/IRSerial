@@ -19,52 +19,20 @@ CMDS = {
 112 : ('SLEEP', 'sudo pm-suspend')
 }
 
-def int2ss(ss):
-    return ''.join((str(th),chr(th+ord('a')-10))[th > 9] for th in ss)
-def valid(ss):
-    return sorted((th+i)%len(ss) for i,th in enumerate(ss)) == list(range(len(ss)))
-def disp():
-    print(int2ss(ss), '-', ('Invalid','Valid')[valid(ss)])
-def add10():
-    if ss and ss[-1] < 26: ss[-1] += 10
-def simulate():
-    if valid(ss) and ss:
-        cmd('google-chrome jugglinglab.sourceforge.net/siteswap.php?'+int2ss(ss))
-    clear()
-def clear():
-    global ss
-    ss = []
 def restart():
     cmd('python ~/scripts/IRSerial/IRserial.py')
     exit()
 
 FUNCTIONS = {
-200 : ('MEM/DISP - show SS', disp),
-178 : ('+10', add10),
-176 : ('X-BASS - clear', clear),
-48 : ('EQUALIZER - simulate', simulate),
-72 : ('REPEAT - restart script', restart),
-0 : ('POWER - exit', exit),
-32 : ('CD - PlayPause', lambda:media.send('PlayPause')),
-144: ('<< - Prev', lambda:media.send('Prev')),
-192 : ('>> - Next', lambda:media.send('Next')),
-16 : ('STOP - Stop', lambda:media.send('Stop')),
+176 : ('X-BASS - restart sccript',  restart),
+0   : ('POWER - exit',              exit),
+32  : ('CD - Play/Pause',           lambda:media.send('PlayPause')),
+40  : ('USB - Play/Pause',          lambda:media.send('PlayPause')),
+144 : ('<< - Previous track',       lambda:media.send('Prev')),
+192 : ('>> - Next track',           lambda:media.send('Next')),
+16  : ('STOP - Stop',               lambda:media.send('Stop')),
+72  : ('REPEAT - toggle repeat',    lambda:media.send('Repeat')),
 }
-
-NUMBERS = {
-146 : 0,
-2 : 1,
-34 : 2,
-18 : 3,
-50 : 4,
-10 : 5,
-42 : 6,
-26 : 7,
-130 : 8,
-162 : 9
-}
-
-ss = []
 
 while 1:
   try:
@@ -74,10 +42,7 @@ while 1:
     print(inp)
   else:
     if m == MODEL:
-      if v in NUMBERS:
-        ss.append(NUMBERS[v])
-        print(NUMBERS[v])
-      elif v in CMDS:
+      if v in CMDS:
         cmd(CMDS[v][1])
         print(CMDS[v][0])
       elif v in FUNCTIONS:
