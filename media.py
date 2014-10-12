@@ -17,7 +17,7 @@ def send(cmd, *args):
     processes = subprocess.check_output(['ps', '-e']).decode('utf-8')
 
     if 'clementine' in processes:
-        Clementine.send(cmd, *args)
+        Clementine.send(cmd.title(), *args)
     elif 'vlc' in processes:
         os.system(vlc_pre+vlc[cmd.lower()])
     else:
