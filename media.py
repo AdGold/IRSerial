@@ -1,6 +1,6 @@
 #! /usr/bin/python
 
-import os, subprocess, sys, dbus
+import os, subprocess, sys, dbus, re
 from clementine import Clementine
 
 vlc_pre = 'dbus-send --session --type=method_call --print-reply --dest=org.mpris.MediaPlayer2.vlc /org/mpris/MediaPlayer2 org.mpris.MediaPlayer2.Player.'
@@ -24,10 +24,33 @@ mplayer = {
     'repeat':'Repeat', #actually loop 0 for repeat and loop -1 
 }
 
+vol_step = 2
+vol_timeout = 500
+volume_cmds = {
+    'up':'amixer sset Master {}%+'.format(vol_step),
+    'down':'amixer sset Master {}%-'.format(vol_step),
+    'mute':'amixer sset Master toggle'
+}
+
 if not os.path.exists(mplayer_fifo):
     os.system('mkfifo '+mplayer_fifo)
 
 def send(cmd, *args):
+    if cmd in volume_cmds:
+        os.system(volume_cmds[cmd])
+        detail = subprocess.check_output(['amixer', 'get', 'Master']).decode('utf-8')
+        detail = [line for line in detail.split('\n') if '%]' in line][0]
+        muted = 'off' in detail
+        volume = int(re.search(r'\[(\d+)%\]', detail).group(1))
+        if cmd == 'mute' and muted:
+            icon = 'audio-volume-muted'
+        else:
+            icon = 'audio-volume-' + ('low', 'medium', 'high')[volume//34]
+        blocks = volume//5
+        bar = '[' + '='*blocks + '-'*(2*(20-blocks)) + ']'
+        title = 'Volume: %d' % (volume if not muted else 0)
+        os.system('notify-send %r %r -i %r -t %d' % (title, bar, icon, vol_timeout))
+        return
     processes = subprocess.check_output(['ps', '-e']).decode('utf-8')
 
     if 'clementine' in processes:
