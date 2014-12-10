@@ -35,21 +35,26 @@ volume_cmds = {
 if not os.path.exists(mplayer_fifo):
     os.system('mkfifo '+mplayer_fifo)
 
+def do_volume(cmd):
+    os.system(volume_cmds[cmd])
+    detail = subprocess.check_output(['amixer', 'get', 'Master']).decode('utf-8')
+    detail = [line for line in detail.split('\n') if '%]' in line][0]
+    muted = 'off' in detail
+    volume = int(re.search(r'\[(\d+)%\]', detail).group(1))
+    if cmd == 'mute' and muted:
+        icon = 'audio-volume-muted'
+    else:
+        icon = 'audio-volume-' + ('low', 'medium', 'high')[volume//34]
+    blocks = volume//5
+    bar = '[' + '='*blocks + '-'*(2*(20-blocks)) + ']'
+    title = 'Volume: ' + (str(volume)+'%' if not muted else 'Muted')
+    os.system('notify-send %r %r -i %r -t %d' % (title, bar, icon, vol_timeout))
+    return volume, muted
+
+
 def send(cmd, *args):
     if cmd in volume_cmds:
-        os.system(volume_cmds[cmd])
-        detail = subprocess.check_output(['amixer', 'get', 'Master']).decode('utf-8')
-        detail = [line for line in detail.split('\n') if '%]' in line][0]
-        muted = 'off' in detail
-        volume = int(re.search(r'\[(\d+)%\]', detail).group(1))
-        if cmd == 'mute' and muted:
-            icon = 'audio-volume-muted'
-        else:
-            icon = 'audio-volume-' + ('low', 'medium', 'high')[volume//34]
-        blocks = volume//5
-        bar = '[' + '='*blocks + '-'*(2*(20-blocks)) + ']'
-        title = 'Volume: %d' % (volume if not muted else 0)
-        os.system('notify-send %r %r -i %r -t %d' % (title, bar, icon, vol_timeout))
+        do_volume(cmd)
         return
     processes = subprocess.check_output(['ps', '-e']).decode('utf-8')
 
