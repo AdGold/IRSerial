@@ -26,6 +26,7 @@ mplayer = {
 
 vol_step = 2
 vol_timeout = 500
+vol_beep = '/home/adrian/scripts/IRSerial/volume.wav'
 volume_cmds = {
     'up':'amixer sset Master {}%+'.format(vol_step),
     'down':'amixer sset Master {}%-'.format(vol_step),
@@ -35,11 +36,13 @@ volume_cmds = {
 if not os.path.exists(mplayer_fifo):
     os.system('mkfifo '+mplayer_fifo)
 
-def do_volume(cmd):
+def do_volume(cmd, snd):
     os.system(volume_cmds[cmd])
     detail = subprocess.check_output(['amixer', 'get', 'Master']).decode('utf-8')
     detail = [line for line in detail.split('\n') if '%]' in line][0]
     muted = 'off' in detail
+    if not muted and snd:
+        os.system('mplayer %s' % vol_beep)
     volume = int(re.search(r'\[(\d+)%\]', detail).group(1))
     if cmd == 'mute' and muted:
         icon = 'audio-volume-muted'
@@ -54,7 +57,7 @@ def do_volume(cmd):
 
 def send(cmd, *args):
     if cmd in volume_cmds:
-        do_volume(cmd)
+        do_volume(cmd, len(args) > 0 and args[0] == 'beep')
         return
     processes = subprocess.check_output(['ps', '-e']).decode('utf-8')
 
@@ -68,4 +71,4 @@ def send(cmd, *args):
         pass
 
 if __name__ == '__main__':
-    send(sys.argv[1])
+    send(sys.argv[1], *sys.argv[2:])
