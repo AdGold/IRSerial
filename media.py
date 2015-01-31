@@ -42,7 +42,8 @@ def do_volume(cmd, snd):
     detail = [line for line in detail.split('\n') if '%]' in line][0]
     muted = 'off' in detail
     if not muted and snd:
-        os.system('mplayer %s' % vol_beep)
+        #os.system('mplayer %s' % vol_beep)
+        os.system('aplay %s' % vol_beep)
     volume = int(re.search(r'\[(\d+)%\]', detail).group(1))
     if cmd == 'mute' and muted:
         icon = 'audio-volume-muted'

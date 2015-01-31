@@ -14,8 +14,6 @@ MODEL = 0
 
 CMDS = {
 168 : ('RANDOM', 'awsetbg -r /home/adrian/Wallpaper/DesktopPhotos'),
-80 : ('VOL DOWN', 'amixer -q sset Master 3%-'),
-208 : ('VOL UP', 'amixer -q sset Master 3%+'),
 112 : ('SLEEP', 'sudo pm-suspend')
 }
 
@@ -32,6 +30,8 @@ FUNCTIONS = {
 192 : ('>> - Next track',           lambda:media.send('Next')),
 16  : ('STOP - Stop',               lambda:media.send('Stop')),
 72  : ('REPEAT - toggle repeat',    lambda:media.send('Repeat')),
+80 : ('VOL DOWN',                   lambda:media.send('down', 'beep')),
+208 : ('VOL UP',                    lambda:media.send('up', 'beep')),
 }
 
 while 1:
@@ -50,5 +50,5 @@ while 1:
         print(FUNCTIONS[v][0])
       else:
         print(v)
-        
+
 
