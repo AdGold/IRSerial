@@ -28,9 +28,9 @@ vol_step = 2
 vol_timeout = 500
 vol_beep = '/home/adrian/scripts/IRSerial/volume.wav'
 volume_cmds = {
-    'up':'amixer sset Master {}%+'.format(vol_step),
-    'down':'amixer sset Master {}%-'.format(vol_step),
-    'mute':'amixer sset Master toggle'
+    'up':'amixer -D pulse sset Master {}%+'.format(vol_step),
+    'down':'amixer -D pulse sset Master {}%-'.format(vol_step),
+    'mute':'amixer -D pulse sset Master toggle'
 }
 
 if not os.path.exists(mplayer_fifo):
@@ -38,7 +38,7 @@ if not os.path.exists(mplayer_fifo):
 
 def do_volume(cmd, snd):
     os.system(volume_cmds[cmd])
-    detail = subprocess.check_output(['amixer', 'get', 'Master']).decode('utf-8')
+    detail = subprocess.check_output(['amixer', '-D', 'pulse', 'get', 'Master']).decode('utf-8')
     detail = [line for line in detail.split('\n') if '%]' in line][0]
     muted = 'off' in detail
     if not muted and snd:
